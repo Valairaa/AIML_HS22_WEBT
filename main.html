@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spezialitäten aus Piemont</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
+    <link rel="stylesheet" href="css/styleguide.css" />
+    <link rel="stylesheet" href="css/styleguideSmartphones.css"/>
+</head>
+
+<body>
+    <header class="w3-container w3-margin-left w3-margin-right">
+        <h1 id="mainTitle" class="mainTitle">Spezialitäten aus Piemont</h1>
+        <canvas id="freeShipping"></canvas>
+        <image class="titelbild" src="img/titelbild_piemont.png" alt="Panorama von Piemont mit Weinbergen"></image>
+    </header>
+    <nav class="w3-bar">
+        <a href="#benutzung" class="w3-button w3-mobile">Benutzung</a>
+        <a href="#onlineShop" class="w3-button w3-mobile">Online Shop</a>
+        <a href="#bestellung" class="w3-button w3-mobile">Bestellung</a>
+    </nav>
+
+    <section class="w3-container w3-animate-opacity">
+        <div id="benutzung">
+            <h3>Benutzung</h3>
+            <div class="w3-row-padding">
+                <image class="infoBild" src="img/nutzungShop.png" alt="Infobild für die Benutzung"></image>
+                <div id="beschrieb">
+                    <p>1. Unter der Rubrik Filter können die Produkte nach Kategorien gefiltert werden.</p>
+                    <p>2. Beim Klick auf Filtern wird man auf eine neue Seite geleitet und sieht die ausgewählten Filter und kann diese durch Klicken auf den Link anwenden. </p>
+                    <p>3. Die Produkte können durch Klicken auf die Buttons hinzugefügt oder zurückgesetzt werden.</p>
+                    <p>4. Die Produkte werden in einem Warenkorb gesammelt und können dort auch wieder gelöscht werden.</p>
+                    <p>5. Sobald alle Produkte ausgewählt wurden, kann der User die Benutzerdaten eingeben.</p>
+                    <p>6. Die Bestellung wird bestätigt und der User erhält eine Bestätigung auf der verlinkten Webpage.</p>
+                </div>
+        </div>
+        <div id="onlineShop">
+            <h3>Online Shop</h3>
+            <p>Bestellen sie hier ihre lokale Produkte aus dem wunderschönen Piemont.
+            </p>
+            <div id="wrapper" class="wrapper">
+                <div id="sortiment" class="filterContainer" >
+                    <h4>Filter</h4>
+                    <form id="filterCheckboxes" class="filterCheckboxes" method="POST" action="main.php">
+                        <div>
+                            <input type="checkbox" id="filterAlles" name="filterAlles" value="true">
+                            <label for="filter1">&nbsp;Alle Artikel</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="filterVegetarisch" name="filterVegetarisch" value="true">
+                            <label for="filter2">&nbsp;Vegetarisch</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="filterFleisch" name="filterFleisch" value="true">
+                            <label for="filter3">&nbsp;Fleisch</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="filterKaese" name="filterKaese" value="true">
+                            <label for="filter4">&nbsp;Käse</label>
+                        </div>
+                        <button name="filterButton" class="w3-button w3-black, filterButton" id="filterButton" type="submit" value="true">Filtern</button>
+                    </form>
+                </div>
+                <!-- Die Bilder wurden aus dem folgenden Webshop entnommen. -->
+                <!-- https://www.italybite.it/de.html -->
+                <div class="productContainer">
+                    <div class="scrollableContainer">
+                        <div v-for="item in items">
+                            <!-- Filtereinstellung für die Cookies -->
+                            <div v-if="filterMitCookies(item)">
+                                <!-- Updated alle Produkte durch die bestehenden Cookies beim PageRefresh -->
+                                <div v-if="item.updated == 'no'">
+                                    <div v-if="updateCookieEasy(item.name) > 0">
+                                        {{ item.anzahl = updateCookieEasy(item.name) }}
+                                    </div>
+                                    <div v-else>
+                                        {{ item.anzahl = 0 }}
+                                    </div>
+                                    {{ item.updated = 'yes' }}
+                                </div>
+                                <!-- Produkte werden hier dargestellt -->
+                                <div class="productBlocks">
+                                    <h4>{{ item.name }}</h4>
+                                    <image v-bind:src="item.img" v-bind:alt="item.name" class="productImage" /></image>
+                                    <p>Preis {{ item.kosten }} CHF</p>
+                                    <p>Anzahl im Warenkorb: {{ item.anzahl }}</p>
+                                    <button v-on:click = "(item.anzahl ++)" class="w3-button w3-black, productButtons"> Hinzufügen</button>
+                                    <button v-on:click = "(item.anzahl = 0)" class="w3-button w3-black, productButtons"> Zurücksetzen</button>
+                                </div>
+                                <!-- Erstellt und aktualisiert für jedes ausgewählte Produkt ein Cookie mit deren Anzahl. -->
+                                {{ createCookie(item.name, item.anzahl) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button v-on:click = "resetAll" class="w3-button w3-black, buttonWarenkorb">Warenkorb zurücksetzen</button>
+                <p name="warenWert" id="warenWert"> Aktueller Warenwert: {{ sum().toFixed(2) }} CHF</p>
+                <p>(Es werden nur die sichtbaren Artikel aufsummiert)</p>
+            </div>
+        </div>
+
+        <h3 id="bestellung">Bestellung abschliessen</h3>
+        <form id="benutzer" method="POST" action="main.php" class="w3-container">
+            <div class="w3-row-padding">
+                <div class="w3-third">
+                    <label>Name</label>
+                    <input type="text" v-model="user.name" name="userName" id="userName" class="w3-input w3-border w3-hover-border-green" placeholder='Max Muster'>
+                    <p class="error" v-if="nameIsValid()">Bitte geben Sie einen richtigen Namen ein.</p>
+                </div>
+                <div class="w3-third">
+                    <label>E-Mail</label>
+                    <input type="text" v-model="user.mail" name="userMail" id="userMail" class="w3-input w3-border w3-hover-border-green"  placeholder="test@mail.ch">
+                    <p class="error" v-if=mailIsValid()>Bitte geben Sie eine richtige Mailadresse ein.</p>
+                </div>
+                <div class="w3-third">
+                    <label>Adresse</label>
+                    <input type="text" v-model="user.adresse" name="userAdresse" id="userAdresse" class="w3-input w3-border w3-hover-border-green" placeholder="Musterstrasse 24b">
+                    <p class="error" v-if=adresseIsValid()>Bitte geben Sie eine richtigen Adresse ein.</p>
+                </div>
+            </div>
+            <div class="w3-row-padding">
+                <div class="w3-third">
+                    <label>Postleitzahl</label>
+                    <input type="text" v-model="user.plz" name="userPLZ" id="userPLZ" class="w3-input w3-border w3-hover-border-green" placeholder='6343'>
+                    <p class="error" v-if=plzIsValid()>Bitte geben Sie eine richtigen Postleitzahl ein.</p>
+                </div>
+                <div class="w3-third">
+                    <label>Ort</label>
+                    <input type="text" v-model="user.ort" name="userOrt" id="userOrt" class="w3-input w3-border w3-hover-border-green" placeholder="Rotkreuz">
+                    <p class="error" v-if=ortIsValid()>Bitte geben Sie eine richtige Ortschaft ein.</p>
+                </div>
+                <div  id="submitButton" class="w3-third">
+                    <button :disabled="nameIsValid() || mailIsValid() || adresseIsValid() || plzIsValid() || ortIsValid()
+                    || user.name == '' || user.mail == '' || user.adresse == '' || user.plz == '' || user.ort == ''"
+                    name="bestellen" type="submit" class="w3-input w3-button" value="true" >BESTELLEN</button>
+                </div>
+            </div>
+        </form> 
+        
+        <div id="impressum">
+            <div>
+                <h3>Impressum</h3>
+                <p>Spezialitäten aus Piemont</p>
+                <div>Musterstrasse 24b</div>
+                <div>6343 Rotkreuz</div>
+                <p>+41 41 757 68 11</p>
+                <p>muster.mail@muster.com</p>
+            </div>
+        </div>
+
+    </section>
+
+    <footer>
+        <p id="copyright">ONLINE WEBSHOP - Spezialitäten aus Piemont © Lukas Stöckli</p>
+    </footer>
+
+    <script src="./js/formular.js"></script>
+    <script src="./js/canvasFreeShipping.js"></script>
+</body>
+
+</html>

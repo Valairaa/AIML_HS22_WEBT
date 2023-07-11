@@ -1,0 +1,69 @@
+/* Styleguide für alle mobilen Apps - Smartphones */
+@media (max-width: 680px) {
+
+    .mainTitle {
+        font-size: 1em;
+    }
+
+    html {
+        background-color: #154f4b62;
+        margin: 0em 0em 0em 0em;
+        font-size: 0.5em;
+    }
+
+    #wrapper {
+        height: 70em;
+        width: 125%;
+        display: grid;
+    }
+
+    section {
+        margin: 0em 0em 0em 0em;
+    }
+
+    .filterContainer {
+        height: 15em;
+        width: 80%;
+        border: 1px solid black;
+        background-color: #218a8300;
+    }
+
+    #filterCheckboxes {
+        position: relative;
+        display: grid;
+        height: 3em;
+        grid-template-rows: 50% 50%;
+        grid-template-areas: "div div"
+                             "div div"
+                             "div div";
+    }
+
+    .filterButton {
+        height: 3em;
+        width: 195%;
+        background-color: #7cb7b3;
+        margin: 1em 0em 0em 0em;
+    }
+
+    .productContainer{
+        height: 56em;
+        width: 80%;
+        border: 2px solid black;
+        background-color: #218a831d;
+        overflow: auto;
+    }
+
+    .productBlocks{
+        border: 2px solid black;
+        padding: 0.5%;
+        margin-left: 2%;
+        margin-right: 0%;
+        margin: 1% 0% 0% 1%;
+        width: 98%;
+        
+        text-align: center;
+        background-color: #218a83;
+        border-image-width: 0.5em;
+        float: left;
+    }
+}
